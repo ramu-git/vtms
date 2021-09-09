@@ -1,0 +1,185 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <link rel="stylesheet" href="css/trades.css">
+    <style>
+
+        label {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 20px;
+            margin-left: 40px;
+            color:cornflowerblue
+        }
+
+        button {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 20px;
+            font-weight: bold;
+            background-color: lawngreen;
+            margin-left: 40px;
+        }
+
+        input {
+            color: #232F3E;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 20px;
+            margin-left: 20px;
+        }
+
+        .rTable {
+            display: table;
+            width: 500px;
+        }
+
+        .rTableRow {
+            display: table-row;
+        }
+
+        .rTableHeading {
+            display: table-header-group;
+            background-color: #ddd;
+        }
+
+        .rTableCell, .rTableHead {
+            display: table-cell;
+            padding: 3px 10px;
+        }
+
+        .rTableHeading {
+            display: table-header-group;
+            background-color: #ddd;
+            font-weight: bold;
+        }
+
+        .rTableFoot {
+            display: table-footer-group;
+            font-weight: bold;
+            background-color: #ddd;
+        }
+
+        .rTableBody {
+            display: table-row-group;
+    </style>
+    <script>var callAPI = (tDate, tTicker, tCompany, tQuantity, tPrice, tValue) => {
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            var raw = JSON.stringify({
+                "TradeDate": tDate,
+                "Tradeid": tTicker,
+                "Company": tCompany,
+                "Quantity": tQuantity,
+                "Price": tPrice,
+                "MarketValue": tValue,
+            });
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: raw,
+            };
+
+            fetch("https://297b3cnjp1.execute-api.us-east-1.amazonaws.com/prod/trades", requestOptions)
+                .then(response => response.text())
+                .then(result => alert(JSON.parse(result).body))
+                .catch(error => console.log('error', error));
+        }</script>
+
+</head>
+<body>
+    <h1 style="color: #FF9900;">Ramus Top Trades</h1>
+
+    <table class="zigzag">
+        <thead>
+            <tr>
+                <th class="header">Trade Date</th>
+                <th class="header">Ticker</th>
+                <th class="header">Company</th>
+                <th class="header">Quantity</th>
+                <th class="header">Price</th>
+                <th class="header">Market Value</th>
+            </tr>
+        </thead>
+        <tbody id="trade-body">
+        </tbody>
+    </table>
+    <br /><br /><br />
+
+    <h1 style="color: #FF9900;">Add New Trade</h1>
+    <form>
+        <div class="rTable">
+            <div class="rTableRow">
+                <div class="rTableCell">
+                    <label>Trade Date :</label>
+                </div>
+                <div class="rTableCell">
+                    <input type="text" id="tDate">
+                </div>
+            </div>
+            <div class="rTableRow">
+                <div class="rTableCell"><label>Ticker :</label></div>
+                <div class="rTableCell"><input type="text" id="tTicker" /></div>
+            </div>
+            <div class="rTableRow">
+
+                <div class="rTableCell"><label>Company :</label></div>
+                <div class="rTableCell"><input type="text" id="tCompany" /></div>
+            </div>
+            <div class="rTableRow">
+                <div class="rTableCell"><label>Quantity :</label></div>
+                <div class="rTableCell"><input type="text" id="tQuantity" /></div>
+            </div>
+            <div class="rTableRow">
+                <div class="rTableCell"><label>Price :</label></div>
+                <div class="rTableCell"><input type="text" id="tPrice" /></div>
+            </div>
+            <div class="rTableRow">
+                <div class="rTableCell"><label>Market Value :</label></div>
+                <div class="rTableCell"><input type="text" id="tValue" /></div>
+            </div>
+            <div class="rTableRow">
+                <div class="rTableCell"></div>
+                <div class="rTableCell">
+                    <button id="btnTrade" type="button" onclick="callAPI(document.getElementById('tDate').value,
+                    document.getElementById('tTicker').value, document.getElementById('tCompany').value,
+                    document.getElementById('tQuantity').value, document.getElementById('tPrice').value,
+                    document.getElementById('tValue').value)">
+                        Submit
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript">var API_URL = 'https://297b3cnjp1.execute-api.us-east-1.amazonaws.com/prod/trades';
+
+        $(document).ready(function () {
+            $.ajax({
+                url: API_URL,
+                type: 'GET',
+                success: function (data) {
+                    $.each(data, function (index) {
+                        console.log(data[index]);
+
+                        var row = $("<tr>");
+                        var tradeid = $("<td>" + data[index].Tradeid + "</td>");
+                        var tradeDate = $("<td>" + data[index].TradeDate + "</td>");
+                        var quantity = $("<td>" + data[index].Quantity + "</td>");
+                        var price = $("<td>" + data[index].Price + "</td>");
+                        var marketValue = $("<td>" + data[index].MarketValue + "</td>");
+                        var company = $("<td>" + data[index].Company + "</td>");
+                        var rowfooter = $("</tr>");
+                        row.append([tradeDate, tradeid, company, quantity, price, marketValue]);
+                        $('#trade-body').append(row);
+                                });
+                },
+                error: function (request, error) {
+                    alert("Request: " + JSON.stringify(request));
+                }
+            });
+        });
+
+    </script>
+</body>
+</html>
